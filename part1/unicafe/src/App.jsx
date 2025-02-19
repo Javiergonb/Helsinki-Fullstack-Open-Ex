@@ -2,21 +2,33 @@ import { useState } from 'react'
 
 
 
-const FeedbackButton = ({text,onClick}) => <button onClick={onClick}>{text}</button>
+const Button = ({text,onClick}) => <button onClick={onClick}>{text}</button>
 
-const Statistics = ({good,neutral,bad,total,average,positivePercent}) => {
-  if (total === 0) {
+const StatisticsLine = ({text,value}) =>{
+  return (
+    <tr>
+      <td>{text}</td>
+      <td>{value}</td>
+    </tr>
+    
+  )
+}
+
+const Statistics = (props) => {
+  if (props.total === 0) {
     return <div>No feedback given</div>
   }
   return (
-    <>
-        <p>good {good}</p>
-        <p>neutral {neutral}</p>
-        <p>bad {bad}</p>
-        <p>all {total}</p>
-        <p>average {average}</p>
-        <p> positive {positivePercent}%</p>
-    </>
+    <table>
+      <tbody>
+        <StatisticsLine value={props.good} text={"good"}></StatisticsLine>
+        <StatisticsLine value={props.neutral} text={"neutral"}></StatisticsLine>
+        <StatisticsLine value={props.bad} text={"bad"}></StatisticsLine>
+        <StatisticsLine value={props.total} text={"all"}></StatisticsLine>
+        <StatisticsLine value={props.average} text={"average"}></StatisticsLine>
+        <StatisticsLine value={props.positivePercent} text={"positive"}></StatisticsLine>
+      </tbody>
+    </table>
   )
 }
 
@@ -32,10 +44,11 @@ const App = () => {
   return (
     <div>
       <h2>Give feedback</h2>
-      <FeedbackButton text={"good"} onClick={() => setGood(good + 1)}></FeedbackButton>
-      <FeedbackButton text={"neutral"} onClick={() => setNeutral(neutral + 1)}></FeedbackButton>
-      <FeedbackButton text={"bad"} onClick={() => setBad(bad + 1)}></FeedbackButton>
+      <Button text={"good"} onClick={() => setGood(good + 1)}></Button>
+      <Button text={"neutral"} onClick={() => setNeutral(neutral + 1)}></Button>
+      <Button text={"bad"} onClick={() => setBad(bad + 1)}></Button>
       <h2>Statistics</h2>
+      
       <Statistics 
         good={good} 
         neutral={neutral} 
@@ -43,8 +56,9 @@ const App = () => {
         total={total} 
         average={average} 
         positivePercent={positivePercent}>
-
         </Statistics>
+      
+      
       
     </div>
   )
