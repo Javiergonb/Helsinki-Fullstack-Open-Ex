@@ -1,10 +1,13 @@
-import { use, useState } from 'react'
+import { useState } from 'react'
 
 
 
 const FeedbackButton = ({text,onClick}) => <button onClick={onClick}>{text}</button>
 
 const Statistics = ({good,neutral,bad,total,average,positivePercent}) => {
+  if (total === 0) {
+    return <div>No feedback given</div>
+  }
   return (
     <>
         <p>good {good}</p>
