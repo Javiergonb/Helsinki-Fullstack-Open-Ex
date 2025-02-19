@@ -4,12 +4,15 @@ import { use, useState } from 'react'
 
 const FeedbackButton = ({text,onClick}) => <button onClick={onClick}>{text}</button>
 
-const Display = ({good,neutral,bad}) => {
+const Statistics = ({good,neutral,bad,total,average,positivePercent}) => {
   return (
     <>
         <p>good {good}</p>
         <p>neutral {neutral}</p>
         <p>bad {bad}</p>
+        <p>all {total}</p>
+        <p>average {average}</p>
+        <p> positive {positivePercent}%</p>
     </>
   )
 }
@@ -30,10 +33,16 @@ const App = () => {
       <FeedbackButton text={"neutral"} onClick={() => setNeutral(neutral + 1)}></FeedbackButton>
       <FeedbackButton text={"bad"} onClick={() => setBad(bad + 1)}></FeedbackButton>
       <h2>Statistics</h2>
-      <Display good={good} neutral={neutral} bad={bad}></Display>
-      <p>all {total}</p>
-      <p>average {average}</p>
-      <p> positive {positivePercent}</p>
+      <Statistics 
+        good={good} 
+        neutral={neutral} 
+        bad={bad} 
+        total={total} 
+        average={average} 
+        positivePercent={positivePercent}>
+
+        </Statistics>
+      
     </div>
   )
 }
