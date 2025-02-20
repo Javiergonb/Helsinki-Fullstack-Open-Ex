@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import PersonForm from './components/PersonForm'
-import personServie from './services/person'
+import personService from './services/person'
+import person from './services/person'
 
 const Persons = ({peopleToShow, handleDeletePerson}) => {
   return(
@@ -28,7 +29,7 @@ const App = () => {
   const [search, setSearch] = useState('')
 
   useEffect(()=>{
-    personServie.getAll()
+    personService.getAll()
     .then(initialPersons =>{
       setPersons(initialPersons)
     })
@@ -52,7 +53,7 @@ const App = () => {
       return
     }
 
-    personServie.deletePerson(id)
+    personService.deletePerson(id)
     .then(deletedPerson => {
       setPersons(persons.filter(person => person.id !== deletedPerson.id))
     })
@@ -64,23 +65,35 @@ const App = () => {
 
   const addPerson = (event) => {
     event.preventDefault()
-    const exists = persons.some((person) => Object.values(person).includes(newName))
-    if (exists){
-      alert(`${newName} is already added to phonebook`)
-      setNewName('')
+    const existingPerson = persons.find((person) => Object.values(person).includes(newName));
+
+    if (!existingPerson){
+      const newPerson = {
+        name: newName,
+        number: newPhone
+      }
+  
+      personService.create(newPerson)
+      .then(person => {
+        setPersons(persons.concat(person))
+        setNewName('')
+        setNewPhone('')
+      })
+    }
+    
+    if(!window.confirm(`${existingPerson.name} is already added to phonebook, replace old number with new one?`)){
       return
     }
-    const newPerson = {
-      name: newName,
-      number: newPhone
-    }
 
-    personServie.create(newPerson)
-    .then(person => {
-      setPersons(persons.concat(person))
-      setNewName('')
-      setNewPhone('')
+    const updatedPerson = {...existingPerson, number: newPhone}
+
+    personService.update(existingPerson.id, updatedPerson)
+    .then(returnedPerson => {
+      console.log(returnedPerson)
+      setPersons(persons.map(person => person.id === returnedPerson.id? returnedPerson: person))
     })
+   
+
   }
 
   return (
