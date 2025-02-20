@@ -2,12 +2,13 @@ import { useEffect, useState } from 'react'
 import PersonForm from './components/PersonForm'
 import personServie from './services/person'
 
-const Persons = ({peopleToShow}) => {
+const Persons = ({peopleToShow, handleDeletePerson}) => {
   return(
     peopleToShow.map(person => 
       <div key={person.name}>
         {person.name} 
-        <b> {person.number}</b>
+        <b> {person.number} </b>
+        <button onClick={() => handleDeletePerson(person.id)}>delete</button>
       </div>)
   )
 }
@@ -44,6 +45,23 @@ const App = () => {
 
   const handleSearchChange = (event) =>setSearch(event.target.value)
 
+  const handleDeletePerson = id => {
+    const person = persons.find(n => n.id === id)
+    
+    if(!window.confirm(`Delete ${person} from phone book?`)){
+      return
+    }
+
+    personServie.deletePerson(id)
+    .then(deletedPerson => {
+      setPersons(persons.filter(person => person.id !== deletedPerson.id))
+    })
+    .catch(error => {
+      alert(`Couldnt delete ${person} from phone book because ${error}`)
+    })
+
+  }
+
   const addPerson = (event) => {
     event.preventDefault()
     const exists = persons.some((person) => Object.values(person).includes(newName))
@@ -78,7 +96,7 @@ const App = () => {
         newPhone = {newPhone}
       />
       <h2>Numbers</h2>
-      <Persons peopleToShow={peopleToShow}/>
+      <Persons peopleToShow={peopleToShow} handleDeletePerson={handleDeletePerson}/>
     </div>
   )
 }
