@@ -4,12 +4,12 @@ import personService from './services/person'
 import Persons from './components/Persons'
 
 
-const Notification = ({ message }) => {
+const Notification = ({ message ,className}) => {
   if (message === null) {
     return null
   }
 
-  return <div className="error">{message}</div>
+  return <div className={className}>{message}</div>
 }
 
 const Filter = ({ value, onChange }) => {
@@ -26,6 +26,7 @@ const App = () => {
   const [newPhone, setNewPhone] = useState('')
   const [search, setSearch] = useState('')
   const [addMessage, setAddMessage] = useState(null)
+  const [errorMessage, setErrorMessage] = useState(null)
 
   useEffect(() => {
     personService.getAll()
@@ -48,7 +49,7 @@ const App = () => {
   const handleDeletePerson = id => {
     const person = persons.find(n => n.id === id)
 
-    if (!window.confirm(`Delete ${person} from phone book?`)) {
+    if (!window.confirm(`Delete ${person.name} from phone book?`)) {
       return
     }
 
@@ -57,7 +58,12 @@ const App = () => {
         setPersons(persons.filter(person => person.id !== deletedPerson.id))
       })
       .catch(error => {
-        alert(`Couldnt delete ${person} from phone book because ${error}`)
+        setErrorMessage(
+          `Information of ${person.name} has already been removed from the server`
+        )
+        setTimeout(() => {
+          setErrorMessage(null)
+        }, 5000)
       })
 
   }
@@ -97,6 +103,14 @@ const App = () => {
         console.log(returnedPerson)
         setPersons(persons.map(person => person.id === returnedPerson.id ? returnedPerson : person))
       })
+      .catch(error => {
+        setErrorMessage(
+          `Information of ${existingPerson.name} has already been removed from the server`
+        )
+        setTimeout(() => {
+          setErrorMessage(null)
+        }, 5000)
+      })
 
 
   }
@@ -104,7 +118,8 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={addMessage}/>
+      <Notification className = "add" message={addMessage}/>
+      <Notification className = "error" message={errorMessage}/>
       <Filter value={search} onChange={handleSearchChange} />
       <h3>Add a new person</h3>
       <PersonForm
