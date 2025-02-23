@@ -10,9 +10,45 @@ const Input = ({ onChange, value, text }) => {
   )
 }
 
+const FullCountryInfo = ({country}) => {
+  return (
+    <div key={country.name.common}>
+      <h1>{country.name.common}</h1>
+      <p>Capital {country.capital}</p>
+      <p>Area {country.area}</p>
+      <h2>Languages</h2>
+      {Object.entries(country.languages).map(([key, value]) => {
+        return <li key={key}><b>{value}</b></li>
+      })}
+      <div>
+        <img style={{width : "100px" , height : "70px", marginTop : "50px"}} src={country.flags.svg} alt={country.flags.alt} />
+      </div>
+    </div>
+  )
+}
+
+
+const CountryListItem = ({ country }) => {
+  const [showInfo, setShowInfo] = useState(false)
+
+  const handleShow = () => {
+    setShowInfo(!showInfo)
+  }
+
+  return (
+    <>
+      <div key={country.name.common}>{country.name.common}</div>
+      <button onClick={handleShow}>
+        {showInfo ? "Hide" : "Show"}
+      </button>
+      {showInfo && <FullCountryInfo country={country} />}
+    </>
+  )
+}
+
 
 const Countries = ({ countries }) => {
-  if (countries == []) {
+  if (countries.length === 0) {
     return null
   }
   if (countries.length > 10) {
@@ -24,27 +60,16 @@ const Countries = ({ countries }) => {
     return (
       <>
         {countries.map(country => {
-          return <div key={country.name.common}>{country.name.common}</div>
+          return <CountryListItem key={country.name.common} country={country}/>
         })}
       </>
     )
   }
   else if (countries.length === 1) {
-    const country = countries[0]
-    console.log(country)
     return (
-      <div key={country.name.common}>
-        <h1>{country.name.common}</h1>
-        <p>Capital {country.capital}</p>
-        <p>Area {country.area}</p>
-        <h2>Languages</h2>
-        {Object.entries(country.languages).map(([key, value]) => {
-          return <li key={key}><b>{value}</b></li>
-        })}
-        <div>
-          <img style={{width : "100px" , height : "70px", marginTop : "50px"}} src={country.flags.svg} alt={country.flags.alt} />
-        </div>
-      </div>
+      <>
+        <FullCountryInfo country={countries[0]}/>
+      </>
     )
   }
 }
@@ -52,7 +77,9 @@ const Countries = ({ countries }) => {
 const App = () => {
   const [search, setSearch] = useState('')
   const [countries, setCountries] = useState([])
-  const filteredCountries = countries.filter(country => country.name.common.toLowerCase().includes(search))
+  const filteredCountries = countries.filter(country => 
+    country.name.common.toLowerCase().includes(search.toLowerCase())
+  )
 
   useEffect(() => {
     axios.get("https://studies.cs.helsinki.fi/restcountries/api/all")
