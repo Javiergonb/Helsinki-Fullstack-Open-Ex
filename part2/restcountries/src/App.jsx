@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from 'axios'
-
+const api_key = import.meta.env.VITE_SOME_KEY
 
 const Input = ({ onChange, value, text }) => {
   return (
@@ -11,6 +11,16 @@ const Input = ({ onChange, value, text }) => {
 }
 
 const FullCountryInfo = ({country}) => {
+  const [weatherInfo, setWeatherInfo] = useState(null)
+
+  useEffect(() => {
+    axios.get(`https://api.openweathermap.org/data/2.5/weather?lat=${country.latlng[0]}&lon=${country.latlng[1]}&appid=${api_key}`) 
+    .then(response => {
+      const initialWeather = response
+      setWeatherInfo(initialWeather)
+    })
+  },[]) 
+
   return (
     <div key={country.name.common}>
       <h1>{country.name.common}</h1>
@@ -23,6 +33,14 @@ const FullCountryInfo = ({country}) => {
       <div>
         <img style={{width : "100px" , height : "70px", marginTop : "50px"}} src={country.flags.svg} alt={country.flags.alt} />
       </div>
+      {weatherInfo?(
+        <>
+          <h2>Weather in {country.name.common}</h2>
+          <p>Temperature {weatherInfo.data.main.temp - 273.15} Celsius</p>
+          <img src={`https://openweathermap.org/img/wn/${weatherInfo.data.weather[0].icon}@2x.png`} alt="" />
+          <p>Wind {weatherInfo.data.wind.speed} m/s</p>
+        </>
+      ): null}
     </div>
   )
 }
